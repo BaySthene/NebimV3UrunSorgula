@@ -1,4 +1,4 @@
-# scanner
+# NebimV3UrunSorgula
 
-Limon Teknoloji Barkod Okuyucu
+Nebim V3 Ürün Sorgula
 
