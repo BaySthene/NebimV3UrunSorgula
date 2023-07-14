@@ -48,8 +48,10 @@ class _MyMobileBodyState extends State<MyMobileBody> {
       if(_myBox.get(2) != null){
         ipAdress = readData();
       }else {
-        writeData("setuped");
+        setIpAdress();
+        //writeData("setuped");
         ipAdress = _myBox.get(1);
+        print(ipAdress);
       }
   }
 
@@ -302,7 +304,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 20,right: 10,top: 20,),
                               child:TextField(
-                                controller: _controller,
+                               // controller: _controller,
                                 decoration: const InputDecoration(
                                   labelText: "Barkod",
                                   labelStyle: TextStyle(
