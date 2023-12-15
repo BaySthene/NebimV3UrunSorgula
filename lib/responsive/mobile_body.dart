@@ -5,12 +5,13 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'productCard.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'dart:io';
 
 class MyMobileBody extends StatefulWidget {
   const MyMobileBody({Key? key}) : super(key: key);
-
   @override
   State<MyMobileBody> createState() => _MyMobileBodyState();
 }
@@ -21,15 +22,20 @@ void clearText() {
   fieldText.clear();
 }
 class _MyMobileBodyState extends State<MyMobileBody> {
-  late AudioPlayer audioPlayer;
-  late AudioCache audioCache;
+  String? _deviceId = '';
+  //late AudioPlayer audioPlayer;
+  //late AudioCache audioCache;
 
   String _scanBarcode = '';
   String ipAdress = '';
   List productDetails = [];
   List<CountryCard> cards = [];
+  List Table = [];
   List dataColumns = ['Lütfen Ürün Aratın Veya Barkod Okutun'];
-  var dataRows = [];
+  bool licenseError = false;
+  Map<String, dynamic> licenseArray = {};
+  Map<String,dynamic> dataRows = {};
+
   String response = '';
   var queryResponse  = { 'default' : 'Hoşgeldin' };
   TextEditingController _controller = TextEditingController();
@@ -40,23 +46,44 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   void initState() {
 
     super.initState();
-    _controller.text = '89.252.188.10:61500';
-    _barcodeController.text = '8682921261146';
+    _controller.text = readData();
 
-    audioPlayer = AudioPlayer();
-    audioCache = AudioCache();
+    //audioPlayer = AudioPlayer();
+    //audioCache = AudioCache();
       if(_myBox.get(2) != null){
         ipAdress = readData();
       }else {
         setIpAdress();
         //writeData("setuped");
         ipAdress = _myBox.get(1);
-        print(ipAdress);
       }
+    initPlatformState();
+  }
+
+  Future<void> initPlatformState() async {
+    String? deviceId;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+    } on PlatformException {
+      deviceId = 'Failed to get deviceId.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _deviceId = deviceId;
+      print(_deviceId);
+
+    });
   }
 
   void playSound() async {
-     await audioCache.play('beep.mp3');
+    //final player = AudioPlayer();
+    //await player.play(UrlSource('beep.mp3'));
 
   }
 
@@ -75,7 +102,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
       900: Color(0xFF6EC3EF),
     },
   );
-
+//1091641085746
   final _myBox = Hive.box('mybox');
   Future<void> writeData(String _data) async {
     _myBox.put(1,_data);
@@ -104,38 +131,59 @@ class _MyMobileBodyState extends State<MyMobileBody> {
 
   Future<void> getProductData(String _scanBarcode) async {
 
-    //ipAdress = getIPAddress().toString();
-
-    var r = await Requests.post(
+//localhost:8000/laravel/public/api/v1/searchProductByBarcode
+   /* var r = await Requests.post(
         'http://$ipAdress/home/getChart',
         body: {
           'val': _scanBarcode,
         },
-        bodyEncoding: RequestBodyEncoding.FormURLEncoded);
-    r.raiseForStatus();
-    List decodedJson = jsonDecode(r.body);
-    setState(() {
-      productDetails = decodedJson[1]['Data'];
-      dataRows = decodedJson[0]['Data'];
-      dataRows.forEach((element) {
-        dataColumns = element.keys.toList();
+        bodyEncoding: RequestBodyEncoding.FormURLEncoded);*/
 
+    try {
+      var plartform = '';
+      if (Platform.isIOS) {
+        plartform = 'ios';
+      }else{
+        plartform = 'android';
+      }
+      var r = await Requests.post(
+          'http://$ipAdress/v3/public/api/v1/searchProductByBarcode',
+          body: {
+            'hwid': _deviceId,
+            'barcode': _scanBarcode,
+            'plartform': plartform,
+            //89.252.188.10:2207
+          },
+          bodyEncoding: RequestBodyEncoding.FormURLEncoded);
+      setState(() {
+        dynamic errorhandler = jsonDecode(r.body);
+
+        if(errorhandler is Map && errorhandler.containsKey('errors')){
+          licenseArray = Map<String, dynamic>.from(errorhandler);
+        }else{
+          productDetails = jsonDecode(r.body)[0];
+          Table = jsonDecode(r.body)[1];
+          getCards();
+
+          jsonDecode(r.body)[1].forEach((element) {
+            dataColumns = element.keys.toList();
+          });
+          licenseArray = {};
+
+          getCards();
+        }
+        
 
       });
-      getCards();
+    } catch (e) {
+      if (e is HTTPException) {
+        print("HTTP Hatası: ${e.message}");
+      } else {
+        print("Bilinmeyen bir hata oluştu: $e");
+      }
+    }
 
 
-      dataRows = dataRows.map((product) {
-        product.forEach((key, value) {
-          if (value == "0") {
-            product[key] = "";
-          }
-
-        });
-        return product;
-      }).toList();
-
-    });
   }
 
   void setIpAdress() {
@@ -324,10 +372,24 @@ class _MyMobileBodyState extends State<MyMobileBody> {
                                 ),
 
                                 onSubmitted: (String _scanBarcode) async {
-                                  setState(() {
-                                    getProductData(_scanBarcode);
-                                    clearText();
-                                  });
+                                  if(licenseArray.containsKey('errors')){
+                                    Alert(context: context,type: AlertType.error, title: "Nebim V3 Urun Sorgula", desc: licenseArray['errors'].toString(),
+                                        buttons: [
+                                          DialogButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: Text(
+                                              "Kapat",
+                                              style: TextStyle(color: Colors.black, fontSize: 20),
+                                            ),
+                                          )
+                                        ]
+                                    ).show();
+                                  }else{
+                                    setState(() {
+                                      getProductData(_scanBarcode);
+                                      clearText();
+                                    });
+                                  }
 
                                 },
 
@@ -438,7 +500,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
                     )).toList(),
 
                     rows:List<DataRow>.generate(
-                  dataRows.length,
+                  Table.length,
                       (index) => DataRow(
                     color: MaterialStateProperty.resolveWith<Color?>(
                             (Set<MaterialState> states) {
@@ -455,7 +517,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
                         Container(
                           alignment: Alignment.center,
                           child: Text(
-                            dataRows[index][column].toString(),
+                            Table[index][column].toString(),
                             textAlign: TextAlign.center,
                           ),
                         )
