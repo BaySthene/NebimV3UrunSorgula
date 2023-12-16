@@ -45,7 +45,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   void initState() {
 
     super.initState();
-    _controller.text = '89.252.188.10:61500';
+    _controller.text = '89.252.188.10:2207';
     _barcodeController.text = '8682921261146';
 
     //audioPlayer = AudioPlayer();
@@ -154,6 +154,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
             'plartform': plartform,
             //89.252.188.10:2207
           },
+          timeoutSeconds :30,
           bodyEncoding: RequestBodyEncoding.FormURLEncoded);
       setState(() {
         dynamic errorhandler = jsonDecode(r.body);
