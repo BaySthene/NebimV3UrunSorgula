@@ -40,7 +40,6 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   var queryResponse  = { 'default' : 'Hoşgeldin' };
   TextEditingController _controller = TextEditingController();
   TextEditingController _barcodeController = TextEditingController();
-  TextEditingController _scanController = TextEditingController();
   @override
 
   void initState() {
