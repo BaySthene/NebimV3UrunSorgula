@@ -45,18 +45,17 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   void initState() {
 
     super.initState();
-    _controller.text = '89.252.188.10:2207';
-    _barcodeController.text = '8682921261146';
+    _controller.text = readData();
 
     //audioPlayer = AudioPlayer();
     //audioCache = AudioCache();
-      if(_myBox.get(2) != null){
-        ipAdress = readData();
-      }else {
-        setIpAdress();
-        //writeData("setuped");
-        ipAdress = _myBox.get(1);
-      }
+    if(_myBox.get(2) != null){
+      ipAdress = readData();
+    }else {
+      setIpAdress();
+      //writeData("setuped");
+      ipAdress = _myBox.get(1);
+    }
     initPlatformState();
   }
 
@@ -132,7 +131,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   Future<void> getProductData(String _scanBarcode) async {
 
 //localhost:8000/laravel/public/api/v1/searchProductByBarcode
-   /* var r = await Requests.post(
+    /* var r = await Requests.post(
         'http://$ipAdress/home/getChart',
         body: {
           'val': _scanBarcode,
@@ -154,7 +153,6 @@ class _MyMobileBodyState extends State<MyMobileBody> {
             'plartform': plartform,
             //89.252.188.10:2207
           },
-          timeoutSeconds :30,
           bodyEncoding: RequestBodyEncoding.FormURLEncoded);
       setState(() {
         dynamic errorhandler = jsonDecode(r.body);
@@ -173,7 +171,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
 
           getCards();
         }
-        
+
 
       });
     } catch (e) {
@@ -208,18 +206,18 @@ class _MyMobileBodyState extends State<MyMobileBody> {
     }
     if (!mounted) return;
 
-      setState(() {
+    setState(() {
 
       _scanBarcode = barcodeScanRes;
       getProductData(_scanBarcode);
       if(_scanBarcode != '-1'){
-          playSound();
+        playSound();
       }
     });
   }
 
   Widget build(BuildContext context) {
-    
+
 
     return Scaffold(
 
@@ -342,165 +340,165 @@ class _MyMobileBodyState extends State<MyMobileBody> {
         child: Column(
           children: [
             Container(
-                  height: 100,
-                  color: Colors.white,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 9,
-                          child: Container(
-                            height: 100,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 20,right: 10,top: 20,),
-                              child:TextField(
-                               // controller: _controller,
-                                decoration: const InputDecoration(
-                                  labelText: "Barkod",
-                                  labelStyle: TextStyle(
-                                    color: Color(0xff4DB0DD),
-                                  ),
-
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Color(0xff4DB0DD), width: 1.0),
-                                  ),
-
-
-                                  hintText: 'Ürün Barkodu Giriniz',
-                                ),
-
-                                onSubmitted: (String _scanBarcode) async {
-                                  if(licenseArray.containsKey('errors')){
-                                    Alert(context: context,type: AlertType.error, title: "Nebim V3 Urun Sorgula", desc: licenseArray['errors'].toString(),
-                                        buttons: [
-                                          DialogButton(
-                                            onPressed: () => Navigator.pop(context),
-                                            child: Text(
-                                              "Kapat",
-                                              style: TextStyle(color: Colors.black, fontSize: 20),
-                                            ),
-                                          )
-                                        ]
-                                    ).show();
-                                  }else{
-                                    setState(() {
-                                      getProductData(_scanBarcode);
-                                      clearText();
-                                    });
-                                  }
-
-                                },
-
-                                controller: fieldText,
-
-
-                              ),
-                            ),
-                          ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          height: 100,
-                          alignment: Alignment.center,
-                          child: Container(
-
-                            child: IconButton(
-                              icon: const Icon(Icons.send),
+              height: 100,
+              color: Colors.white,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 9,
+                    child: Container(
+                      height: 100,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20,right: 10,top: 20,),
+                        child:TextField(
+                          // controller: _controller,
+                          decoration: const InputDecoration(
+                            labelText: "Barkod",
+                            labelStyle: TextStyle(
                               color: Color(0xff4DB0DD),
-                              onPressed: () => {
-                                setState(() {
-                                 getProductData(fieldText.text.toString());
-                                  clearText();
-                                }),
-
-                              },
-                              iconSize: 35,
                             ),
+
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderSide: BorderSide(color: Color(0xff4DB0DD), width: 1.0),
+                            ),
+
+
+                            hintText: 'Ürün Barkodu Giriniz',
                           ),
+
+                          onSubmitted: (String _scanBarcode) async {
+                            if(licenseArray.containsKey('errors')){
+                              Alert(context: context,type: AlertType.error, title: "Nebim V3 Urun Sorgula", desc: licenseArray['errors'].toString(),
+                                  buttons: [
+                                    DialogButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(
+                                        "Kapat",
+                                        style: TextStyle(color: Colors.black, fontSize: 20),
+                                      ),
+                                    )
+                                  ]
+                              ).show();
+                            }else{
+                              setState(() {
+                                getProductData(_scanBarcode);
+                                clearText();
+                              });
+                            }
+
+                          },
+
+                          controller: fieldText,
+
 
                         ),
                       ),
-
-                      Expanded(
-                        flex: 3,
-                          child: Container(
-                                height: 100,
-                                alignment: Alignment.center,
-                                child: Container(
-                                  child: IconButton(
-                                    icon: const Icon(Icons.camera_alt),
-                                    color: Color(0xff4DB0DD),
-                                    onPressed: ()=>scanQR(),
-                                    iconSize: 40,
-                                  ),
-                                ),
-
-                          ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 100,
+                      alignment: Alignment.center,
+                      child: Container(
+
+                        child: IconButton(
+                          icon: const Icon(Icons.send),
+                          color: Color(0xff4DB0DD),
+                          onPressed: () => {
+                            setState(() {
+                              getProductData(fieldText.text.toString());
+                              clearText();
+                            }),
+
+                          },
+                          iconSize: 35,
+                        ),
+                      ),
+
+                    ),
+                  ),
+
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      height: 100,
+                      alignment: Alignment.center,
+                      child: Container(
+                        child: IconButton(
+                          icon: const Icon(Icons.camera_alt),
+                          color: Color(0xff4DB0DD),
+                          onPressed: ()=>scanQR(),
+                          iconSize: 40,
+                        ),
+                      ),
+
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
 
 
 
             Flexible(
               flex: 5,
-                child: ListView.builder(
-                  itemCount: productDetails.length,
-                  itemBuilder: (context, index) {
-                    final jsonVeri = productDetails[index];
-                    final column = jsonVeri["Açıklama"];
-                    final row = jsonVeri['Sonuç'];
+              child: ListView.builder(
+                itemCount: productDetails.length,
+                itemBuilder: (context, index) {
+                  final jsonVeri = productDetails[index];
+                  final column = jsonVeri["Açıklama"];
+                  final row = jsonVeri['Sonuç'];
 
-                    return Padding(
-                      padding: const EdgeInsets.all(2.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(2.0),
 
-                      child: Container(
-                        color: Colors.white,
-                        height: 55,
-                        alignment: Alignment.center,
-                        child:   ListTile(
-                          title: Text(
-                            column.toString(),
-                            textAlign: TextAlign.center,
-                          ),
-                          subtitle: Text(
-                            row.toString(),
-                            textAlign: TextAlign.center,
-                          ),
+                    child: Container(
+                      color: Colors.white,
+                      height: 55,
+                      alignment: Alignment.center,
+                      child:   ListTile(
+                        title: Text(
+                          column.toString(),
+                          textAlign: TextAlign.center,
+                        ),
+                        subtitle: Text(
+                          row.toString(),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
+              ),
             ),
 
             Expanded(
               flex: 7,
-                child: DataTable2(
-                  headingRowColor: MaterialStateProperty.resolveWith(
-                          (states) => 2 > 0 ? Colors.blue[200] : Colors.transparent),
-                    columnSpacing: 12,
-                    dataRowHeight: 40,
-                    headingRowHeight: 40,
-                    horizontalMargin: 12,
-                    minWidth: 600,
-                    columns: dataColumns.map((column) => DataColumn2(
-                      label: Container(
+              child: DataTable2(
+                headingRowColor: MaterialStateProperty.resolveWith(
+                        (states) => 2 > 0 ? Colors.blue[200] : Colors.transparent),
+                columnSpacing: 12,
+                dataRowHeight: 40,
+                headingRowHeight: 40,
+                horizontalMargin: 12,
+                minWidth: 600,
+                columns: dataColumns.map((column) => DataColumn2(
+                  label: Container(
 
-                      alignment: Alignment.center,
-                      child: Text(column, textAlign: TextAlign.center),
-                    ),
-                      size: ColumnSize.L,
+                    alignment: Alignment.center,
+                    child: Text(column, textAlign: TextAlign.center),
+                  ),
+                  size: ColumnSize.L,
 
-                    )).toList(),
+                )).toList(),
 
-                    rows:List<DataRow>.generate(
+                rows:List<DataRow>.generate(
                   Table.length,
                       (index) => DataRow(
                     color: MaterialStateProperty.resolveWith<Color?>(
@@ -525,8 +523,8 @@ class _MyMobileBodyState extends State<MyMobileBody> {
                     )).toList(),
                   ),
                 ),
-                ),
-                /*child: SingleChildScrollView(
+              ),
+              /*child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
