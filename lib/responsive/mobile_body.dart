@@ -25,6 +25,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   String? _deviceId = '';
   //late AudioPlayer audioPlayer;
   //late AudioCache audioCache;
+  String _defaultHOST ="89.252.188.10:2207";
 
   String _scanBarcode = '';
   String ipAdress = '';
@@ -46,6 +47,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
 
     super.initState();
     _controller.text = readData();
+
 
     //audioPlayer = AudioPlayer();
     //audioCache = AudioCache();
@@ -109,6 +111,8 @@ class _MyMobileBodyState extends State<MyMobileBody> {
   }
 
   String readData() {
+    if(_myBox.isEmpty)
+      return _defaultHOST;
     return _myBox.get(1);
   }
 
@@ -145,6 +149,7 @@ class _MyMobileBodyState extends State<MyMobileBody> {
       }else{
         plartform = 'android';
       }
+      print('http://$ipAdress/v3/public/api/v1/searchProductByBarcode');
       var r = await Requests.post(
           'http://$ipAdress/v3/public/api/v1/searchProductByBarcode',
           body: {
@@ -174,8 +179,8 @@ class _MyMobileBodyState extends State<MyMobileBody> {
 
 
       });
-    } catch (e) {
-      if (e is HTTPException) {
+   } catch (e) {
+     if (e is HTTPException) {
         print("HTTP Hatası: ${e.message}");
       } else {
         print("Bilinmeyen bir hata oluştu: $e");
